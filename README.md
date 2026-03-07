@@ -87,9 +87,9 @@ Discover volumes
 ```
 Example:
 
-json
+```json
 {"data":[{"{#VOLUME_NAME}":"gfs"}]}
-
+```
 Get cluster value
 
 ```bash
