@@ -172,20 +172,6 @@ Make sure the zabbix user can run the script with sudo:
 ```bash
 sudo -u zabbix sudo /usr/local/bin/gstatus_discovery.py nodes_active
 ```
-Empty value
-
-Check that you are using the real volume name discovered by the script.
-
-Example:
-
-```bash
-/usr/local/bin/gstatus_discovery.py
-```
-If the volume is gfs, use:
-
-```bash
-/usr/local/bin/gstatus_discovery.py used_capacity gfs
-```
 ---
 #### Credits
 
