@@ -186,16 +186,16 @@ If the volume is gfs, use:
 ```bash
 /usr/local/bin/gstatus_discovery.py used_capacity gfs
 ```
-JSON errors
+### JSON errors
 
 If you see JSONDecodeError, your old script does not match your current gstatus output format. Use the updated script version for modern gstatus.
 Trigger says unhealthy
 
 If the item shows Healthy but the trigger fires, use a direct trigger expression like:
 
-text
+```text
 last(/HOST/gluster_storage_info["status"])<>"Healthy"
-
+```
 instead of a regex-based find() check.
 Credits
 
