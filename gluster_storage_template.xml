@@ -1,0 +1,238 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 7df96b18c230490a9a0a9e2307226338
+      name: 'Templates/Storage'
+  templates:
+    - uuid: 99998298007545ebb910dffdda71ffed
+      template: 'Gluster Storage'
+      name: 'Gluster Storage'
+      description: |
+        Custom GlusterFS monitoring template for Zabbix 7.0, adapted for modern gstatus JSON output.
+
+        This template monitors a GlusterFS cluster through Zabbix agent/agent2 UserParameters
+        that call `/usr/local/bin/gstatus_discovery.py`.
+
+        Validated against gstatus JSON fields like:
+        - cluster_status
+        - node_count
+        - nodes_active
+        - volume_count
+        - volume_summary[].size_total
+        - volume_summary[].size_used
+        - volume_summary[].snapshot_count
+        - volume_summary[].health
+
+        Legacy fields from the original community template such as raw_capacity,
+        sh_enabled, and sh_active were removed because they are not present in the
+        current gstatus output used by this deployment.
+
+        This template monitors a GlusterFS cluster using Zabbix agent or Zabbix agent 2 and a custom helper script.
+
+        Install on the Gluster node:
+        - Python 3
+        - gstatus
+        - `/usr/local/bin/gstatus_discovery.py`
+        - Zabbix agent or Zabbix agent 2
+        - sudo permission for the `zabbix` user to run the helper script
+
+        Example UserParameters:
+        ```ini
+        UserParameter=gluster_volume_name.discovery,sudo /usr/local/bin/gstatus_discovery.py
+        UserParameter=gluster_storage_info[*],sudo /usr/local/bin/gstatus_discovery.py "$1"
+        UserParameter=gluster_volume_info[*],sudo /usr/local/bin/gstatus_discovery.py "$1" "$2"
+        ```
+
+        Example sudoers entry:
+        ```sudoers
+        zabbix ALL=(ALL) NOPASSWD: /usr/local/bin/gstatus_discovery.py
+        ```
+
+        The helper script must map these old template keys to modern gstatus JSON:
+        - status -> cluster_status
+        - used_capacity -> size_used
+        - usable_capacity -> size_total
+        - state -> health
+      vendor:
+        name: 'Custom'
+        version: '7.0-1'
+      groups:
+        - name: 'Templates/Storage'
+      tags:
+        - tag: class
+          value: storage
+        - tag: target
+          value: glusterfs
+      items:
+        - uuid: d86318e42887411a87bb94243e3db533
+          name: 'Gluster Storage % Free Space'
+          type: CALCULATED
+          key: gluster_storage_free_space
+          delay: 2m
+          value_type: FLOAT
+          units: '%'
+          params: '100*((last(/Gluster Storage/gluster_storage_info["usable_capacity"])-last(/Gluster Storage/gluster_storage_info["used_capacity"]))/last(/Gluster Storage/gluster_storage_info["usable_capacity"]))'
+          description: 'Cluster free space percentage calculated from usable and used capacity.'
+          tags:
+            - tag: component
+              value: capacity
+
+        - uuid: 5cc82d58a4d64d0ead376619eb9c4b61
+          name: 'Gluster Storage Active Nodes'
+          key: 'gluster_storage_info["nodes_active"]'
+          delay: 2m
+          value_type: UNSIGNED
+          tags:
+            - tag: component
+              value: cluster
+
+        - uuid: 0212d95fabcf4741957cc9c3a840ad0a
+          name: 'Gluster Storage Nodes'
+          key: 'gluster_storage_info["node_count"]'
+          delay: 2m
+          value_type: UNSIGNED
+          tags:
+            - tag: component
+              value: cluster
+
+        - uuid: 29800442c7244a3996fb22a5a1af4a50
+          name: 'Gluster Storage Snapshots'
+          key: 'gluster_storage_info["snapshot_count"]'
+          delay: 2m
+          value_type: UNSIGNED
+          tags:
+            - tag: component
+              value: snapshots
+
+        - uuid: d8866bb6eabe481fa3950d823b1ac600
+          name: 'Gluster Storage Status'
+          key: 'gluster_storage_info["status"]'
+          delay: 2m
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: component
+              value: health
+          triggers:
+            - uuid: e9e837e820db46c9b1c89d9134dc6659
+              expression: 'find(/Gluster Storage/gluster_storage_info["status"],,"iregexp","healthy")=0'
+              name: 'Gluster Storage status is unhealthy'
+              priority: WARNING
+              description: 'Cluster status returned by gstatus does not contain "healthy".'
+              tags:
+                - tag: scope
+                  value: health
+
+        - uuid: 52ce7337ca834f64bf68a8a3adb2a3e6
+          name: 'Gluster Storage Total Size'
+          key: 'gluster_storage_info["usable_capacity"]'
+          delay: 2m
+          value_type: UNSIGNED
+          units: B
+          tags:
+            - tag: component
+              value: capacity
+
+        - uuid: ec68d0a841bb49b3b69b8a5574eac4d5
+          name: 'Gluster Storage Used Size'
+          key: 'gluster_storage_info["used_capacity"]'
+          delay: 2m
+          value_type: UNSIGNED
+          units: B
+          tags:
+            - tag: component
+              value: capacity
+
+        - uuid: ca6fc41674514df8b6821d5d835f0177
+          name: 'Gluster Storage Volume Number'
+          key: 'gluster_storage_info["volume_count"]'
+          delay: 2m
+          value_type: UNSIGNED
+          tags:
+            - tag: component
+              value: cluster
+
+      discovery_rules:
+        - uuid: c9ef492726ff47a1a04ecdb3d2874ceb
+          name: 'Gluster Volume Names Discovery'
+          key: gluster_volume_name.discovery
+          delay: 5m
+          type: ZABBIX_PASSIVE
+          description: 'Discovers Gluster volume names from gstatus_discovery.py output.'
+          item_prototypes:
+            - uuid: c8544e009afb4216ae0529c43b1d96af
+              name: 'Gluster Volume % Free Space {#VOLUME_NAME}'
+              type: CALCULATED
+              key: 'gluster_volume_free_space[{#VOLUME_NAME}]'
+              delay: 5m
+              value_type: FLOAT
+              units: '%'
+              params: '100*((last(/Gluster Storage/gluster_volume_info["usable_capacity",{#VOLUME_NAME}])-last(/Gluster Storage/gluster_volume_info["used_capacity",{#VOLUME_NAME}]))/last(/Gluster Storage/gluster_volume_info["usable_capacity",{#VOLUME_NAME}]))'
+              tags:
+                - tag: component
+                  value: capacity
+              trigger_prototypes:
+                - uuid: c0794d96120145b588f93c668e9c6394
+                  expression: 'last(/Gluster Storage/gluster_volume_free_space[{#VOLUME_NAME}],#1)<20'
+                  name: 'Gluster Volume free space is less than 20% on {#VOLUME_NAME}'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: capacity
+
+            - uuid: 05451268b8294ce49e654a18327aeca7
+              name: 'Gluster Volume snapshot count on {#VOLUME_NAME}'
+              key: 'gluster_volume_info["snapshot_count",{#VOLUME_NAME}]'
+              delay: 5m
+              value_type: UNSIGNED
+              tags:
+                - tag: component
+                  value: snapshots
+
+            - uuid: 7aa532b341d249e88a0281ae73eaf0e2
+              name: 'Gluster Volume state on {#VOLUME_NAME}'
+              key: 'gluster_volume_info["state",{#VOLUME_NAME}]'
+              delay: 5m
+              trends: '0'
+              value_type: TEXT
+              tags:
+                - tag: component
+                  value: health
+              trigger_prototypes:
+                - uuid: 5034c13c8d2b4fc49afafff7744b85d6
+                  expression: 'find(/Gluster Storage/gluster_volume_info["state",{#VOLUME_NAME}],,"like","up")=0'
+                  name: 'Gluster Volume state on {#VOLUME_NAME} is down'
+                  priority: WARNING
+                  tags:
+                    - tag: scope
+                      value: health
+
+            - uuid: a84833e5ec524cd7bc0c09b20b717bc5
+              name: 'Gluster Volume Total Size on {#VOLUME_NAME}'
+              key: 'gluster_volume_info["usable_capacity",{#VOLUME_NAME}]'
+              delay: 5m
+              value_type: UNSIGNED
+              units: B
+              tags:
+                - tag: component
+                  value: capacity
+
+            - uuid: dfcfa580e9e04875ba03681611cd4a26
+              name: 'Gluster Volume Used Size on {#VOLUME_NAME}'
+              key: 'gluster_volume_info["used_capacity",{#VOLUME_NAME}]'
+              delay: 5m
+              value_type: UNSIGNED
+              units: B
+              tags:
+                - tag: component
+                  value: capacity
+
+  triggers:
+    - uuid: 9cd6d6af0143406e8fe7771917f37dc3
+      expression: 'last(/Gluster Storage/gluster_storage_info["nodes_active"])<last(/Gluster Storage/gluster_storage_info["node_count"])'
+      name: 'Gluster storage nodes are not all online'
+      priority: INFO
+      description: 'The number of active nodes is lower than the total number of nodes.'
+      tags:
+        - tag: scope
+          value: availability
