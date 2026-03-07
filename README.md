@@ -14,7 +14,7 @@ This project was updated for modern `gstatus` JSON output and Zabbix 7.x. The or
 Install on the **Gluster node** you want Zabbix to monitor:
 
 - Python 3
-- `gstatus`
+- gstatus
 - Zabbix agent or Zabbix agent 2
 
 `gstatus` must be run as root or with sudo because it calls the Gluster CLI internally.
