@@ -7,7 +7,7 @@ The script:
 - Returns cluster values for Zabbix items.
 - Returns per-volume values for Zabbix low-level discovery.
 
-This project was updated for modern `[gstatus]([url](https://github.com/gluster/gstatus))` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
+This project was updated for modern `gstatus` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
 
 #### Credits
 
