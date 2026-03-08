@@ -9,7 +9,6 @@ The script:
 
 This project was updated for modern `gstatus` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
 
----
 #### Credits
 
 Original project by MrCirca:
