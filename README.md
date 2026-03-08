@@ -63,13 +63,7 @@ Create:
 ```bash
 /etc/zabbix/zabbix_agent2.d/glusterfs.conf
 ```
-#### Classic Zabbix agent
 
-Create:
-
-```bash
-/etc/zabbix/zabbix_agentd.d/glusterfs.conf
-```
 Add:
 
 ```text
@@ -85,8 +79,7 @@ Restart the agent after saving:
 systemctl restart zabbix-agent2
 ```
 
-Agent include files and custom user parameters are supported by both agent and agent 2.
-Test commands
+#### Test commands
 Discover volumes
 
 ```bash
