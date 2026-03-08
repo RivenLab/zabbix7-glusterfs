@@ -26,7 +26,7 @@ Install on the **Gluster node** you want Zabbix to monitor:
 
 - Python 3
 - [gstatus](https://github.com/gluster/gstatus)
-- Zabbix agent or Zabbix agent 2
+- Zabbix agent 2
 
 `gstatus` must be run as root or with sudo because it calls the Gluster CLI internally.
 
