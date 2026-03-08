@@ -7,7 +7,7 @@ The script:
 - Returns cluster values for Zabbix items.
 - Returns per-volume values for Zabbix low-level discovery.
 
-This project was updated for modern `gstatus` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
+This project was updated for modern `[gstatus]([url](https://github.com/gluster/gstatus))` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
 
 #### Credits
 
@@ -25,7 +25,7 @@ gstatus project:
 Install on the **Gluster node** you want Zabbix to monitor:
 
 - Python 3
-- gstatus
+- [gstatus]([url](https://github.com/gluster/gstatus))
 - Zabbix agent or Zabbix agent 2
 
 `gstatus` must be run as root or with sudo because it calls the Gluster CLI internally.
