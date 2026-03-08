@@ -8,6 +8,17 @@ The script:
 - Returns per-volume values for Zabbix low-level discovery.
 
 This project was updated for modern `gstatus` JSON output and Zabbix 7.x. The original project was made for older Zabbix versions.
+---
+#### Credits
+
+Original project by MrCirca:
+
+    https://github.com/MrCirca/zabbix-glusterfs
+
+gstatus project:
+
+    https://github.com/gluster/gstatus
+---
 
 ## Requirements
 
@@ -169,12 +180,3 @@ Make sure the zabbix user can run the script with sudo:
 sudo -u zabbix sudo /usr/local/bin/gstatus_discovery.py nodes_active
 ```
 ---
-#### Credits
-
-Original project by MrCirca:
-
-    https://github.com/MrCirca/zabbix-glusterfs
-
-gstatus project:
-
-    https://github.com/gluster/gstatus
