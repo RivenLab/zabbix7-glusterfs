@@ -73,11 +73,7 @@ Restart the agent after saving:
 ```bash
 systemctl restart zabbix-agent2
 ```
-or
 
-```bash
-systemctl restart zabbix-agent
-```
 Agent include files and custom user parameters are supported by both agent and agent 2.
 Test commands
 Discover volumes
@@ -165,7 +161,7 @@ This project uses modern gstatus JSON field mapping:
 Some old fields from the original template were removed or adjusted because they are not present in current gstatus output.
 
 ### Troubleshooting
-Permission denied
+##### Permission denied
 
 Make sure the zabbix user can run the script with sudo:
 
