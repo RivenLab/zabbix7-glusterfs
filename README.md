@@ -41,7 +41,7 @@ visudo /etc/sudoers.d/zabbix
 Add this line:
 
 ```text
-zabbix ALL=(ALL) NOPASSWD: /usr/local/bin/gstatus_discovery.py
+zabbix ALL=(root) NOPASSWD: /usr/local/bin/gstatus_discovery.py, /usr/local/bin/gstatus_discovery.py *
 ```
 Use the full path.
 ### Zabbix agent config
