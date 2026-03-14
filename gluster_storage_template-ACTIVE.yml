@@ -66,11 +66,12 @@ zabbix_export:
           delay: 2m
           value_type: FLOAT
           units: '%'
-          params: '100*(last(//gluster_storage_info["usable_capacity"])-last(//gluster_storage_info["used_capacity"]))/last(//gluster_storage_info["usable_capacity"])'
+          params: '100*(last(//gluster_storage_info[usable_capacity])-last(//gluster_storage_info[used_capacity]))/last(//gluster_storage_info[usable_capacity])'
           description: 'Cluster free space percentage calculated from usable and used capacity.'
           tags:
             - tag: component
               value: capacity
+
         - uuid: 5cc82d58a4d64d0ead376619eb9c4b61
           name: 'Gluster Storage Active Nodes'
           type: ZABBIX_ACTIVE
@@ -79,22 +80,28 @@ zabbix_export:
           tags:
             - tag: component
               value: cluster
+
         - uuid: 0212d95fabcf4741957cc9c3a840ad0a
           name: 'Gluster Storage Nodes'
+          type: ZABBIX_ACTIVE
           key: 'gluster_storage_info["node_count"]'
           delay: 2m
           tags:
             - tag: component
               value: cluster
+
         - uuid: 29800442c7244a3996fb22a5a1af4a50
           name: 'Gluster Storage Snapshots'
+          type: ZABBIX_ACTIVE
           key: 'gluster_storage_info["snapshot_count"]'
           delay: 2m
           tags:
             - tag: component
               value: snapshots
+
         - uuid: d8866bb6eabe481fa3950d823b1ac600
           name: 'Gluster Storage Status'
+          type: ZABBIX_ACTIVE
           key: 'gluster_storage_info["status"]'
           delay: 2m
           value_type: TEXT
@@ -111,29 +118,38 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: health
+
         - uuid: 52ce7337ca834f64bf68a8a3adb2a3e6
           name: 'Gluster Storage Total Size'
-          key: 'gluster_storage_info["usable_capacity"]'
+          type: ZABBIX_ACTIVE
+          key: gluster_storage_info[usable_capacity]
+          value_type: UNSIGNED
           delay: 2m
           units: B
           tags:
             - tag: component
               value: capacity
+
         - uuid: ec68d0a841bb49b3b69b8a5574eac4d5
           name: 'Gluster Storage Used Size'
-          key: 'gluster_storage_info["used_capacity"]'
+          type: ZABBIX_ACTIVE
+          key: gluster_storage_info[used_capacity]
+          value_type: UNSIGNED
           delay: 2m
           units: B
           tags:
             - tag: component
               value: capacity
+
         - uuid: ca6fc41674514df8b6821d5d835f0177
           name: 'Gluster Storage Volume Number'
+          type: ZABBIX_ACTIVE
           key: 'gluster_storage_info["volume_count"]'
           delay: 2m
           tags:
             - tag: component
               value: cluster
+
       discovery_rules:
         - uuid: c9ef492726ff47a1a04ecdb3d2874ceb
           name: 'Gluster Volume Names Discovery'
@@ -161,13 +177,16 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: capacity
+
             - uuid: 05451268b8294ce49e654a18327aeca7
               name: 'Gluster Volume snapshot count on {#VOLUME_NAME}'
+              type: ZABBIX_ACTIVE
               key: 'gluster_volume_info["snapshot_count",{#VOLUME_NAME}]'
               delay: 5m
               tags:
                 - tag: component
                   value: snapshots
+
             - uuid: 7aa532b341d249e88a0281ae73eaf0e2
               name: 'Gluster Volume state on {#VOLUME_NAME}'
               type: ZABBIX_ACTIVE
@@ -186,27 +205,33 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: health
+
             - uuid: a84833e5ec524cd7bc0c09b20b717bc5
               name: 'Gluster Volume Total Size on {#VOLUME_NAME}'
+              type: ZABBIX_ACTIVE
               key: 'gluster_volume_info["usable_capacity",{#VOLUME_NAME}]'
               delay: 5m
               units: B
               tags:
                 - tag: component
                   value: capacity
+
             - uuid: dfcfa580e9e04875ba03681611cd4a26
               name: 'Gluster Volume Used Size on {#VOLUME_NAME}'
+              type: ZABBIX_ACTIVE
               key: 'gluster_volume_info["used_capacity",{#VOLUME_NAME}]'
               delay: 5m
               units: B
               tags:
                 - tag: component
                   value: capacity
+
       tags:
         - tag: class
           value: storage
         - tag: target
           value: glusterfs
+
   triggers:
     - uuid: 9cd6d6af0143406e8fe7771917f37dc3
       expression: 'last(/Gluster Storage/gluster_storage_info["nodes_active"])<last(/Gluster Storage/gluster_storage_info["node_count"])'
